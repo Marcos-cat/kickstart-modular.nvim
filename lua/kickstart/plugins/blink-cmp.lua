@@ -57,6 +57,9 @@ require('blink.cmp').setup {
     -- By default, you may press `<c-space>` to show the documentation.
     -- Optionally, set `auto_show = true` to show the documentation after a delay.
     documentation = { auto_show = false, auto_show_delay_ms = 500 },
+
+    -- Disable auto brackets for functions in Uiua files
+    accept = { auto_brackets = { kind_resolution = { blocked_filetypes = { 'uiua' } } } },
   },
 
   sources = {
