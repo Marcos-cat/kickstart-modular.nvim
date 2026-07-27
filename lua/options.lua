@@ -8,7 +8,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 --  See `:help vim.o`
@@ -19,10 +19,10 @@ vim.g.have_nerd_font = false
 vim.o.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
--- vim.o.relativenumber = true
+vim.o.relativenumber = true
 
--- Enable mouse mode, can be useful for resizing splits for example!
-vim.o.mouse = 'a'
+-- Disable the mouse
+vim.o.mouse = nil
 
 -- Don't show the mode, since it's already in the status line
 vim.o.showmode = false
@@ -80,5 +80,30 @@ vim.o.scrolloff = 10
 -- instead raise a dialog asking if you wish to save the current file(s)
 -- See `:help 'confirm'`
 vim.o.confirm = true
+
+-- When NeoVim is opened with no arguments, then open a file picker
+vim.api.nvim_create_autocmd('VimEnter', {
+  callback = function()
+    if vim.fn.argc() == 0 then vim.schedule(function() require('telescope.builtin').find_files() end) end
+  end,
+})
+
+-- Add recognized file types for non-standard languages
+vim.filetype.add { extension = { ua = 'uiua' } }
+
+-- Make tabs behave as four spaces by default
+vim.o.expandtab = true
+vim.o.shiftwidth = 4
+vim.o.tabstop = 4
+vim.o.softtabstop = 4
+
+vim.o.smartindent = true
+vim.o.wrap = false -- Don't wrap lines
+
+-- Disable the command line unless it is in active use
+vim.o.cmdheight = 0
+
+-- Set an 80 character column that is visible while editing
+vim.o.colorcolumn = '80'
 
 -- vim: ts=2 sts=2 sw=2 et

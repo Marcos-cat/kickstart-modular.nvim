@@ -1,7 +1,6 @@
-local function gh(repo) return 'https://github.com/' .. repo end
-
 -- [[ Formatting ]]
-vim.pack.add { gh 'stevearc/conform.nvim' }
+vim.pack.add { 'https://github.com/stevearc/conform.nvim' }
+
 require('conform').setup {
   notify_on_error = false,
   format_on_save = function(bufnr)
@@ -30,6 +29,6 @@ require('conform').setup {
   },
 }
 
-vim.keymap.set({ 'n', 'v' }, '<leader>f', function() require('conform').format { async = true } end, { desc = '[F]ormat buffer' })
+vim.keymap.set({ 'n', 'v' }, '<leader>fm', function() require('conform').format { async = true } end, { desc = '[F]or[m]at buffer' })
 
 -- vim: ts=2 sts=2 sw=2 et
