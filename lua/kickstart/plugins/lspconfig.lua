@@ -77,20 +77,10 @@ vim.api.nvim_create_autocmd('LspAttach', {
 })
 
 -- Enable the following language servers
---  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
 --  See `:help lsp-config` for information about keys and how to configure
 ---@type table<string, vim.lsp.Config>
-local mason_servers = {
-  -- clangd = {},
-  -- gopls = {},
-  -- pyright = {},
+local servers = {
   tinymist = {},
-  --
-  -- Some languages (like typescript) have entire language plugins that can be useful:
-  --    https://github.com/pmizio/typescript-tools.nvim
-  --
-  -- But for many setups, the LSP (`ts_ls`) will work just fine
-  -- ts_ls = {},
 
   stylua = {}, -- Used to format Lua code
 
@@ -114,6 +104,7 @@ local mason_servers = {
           checkThirdParty = false,
           -- NOTE: this is a lot slower and will cause issues when working on your own configuration.
           --  See https://github.com/neovim/nvim-lspconfig/issues/3189
+
           library = vim.tbl_extend('force', vim.api.nvim_get_runtime_file('', true), {
             '${3rd}/luv/library',
             '${3rd}/busted/library',
@@ -128,16 +119,15 @@ local mason_servers = {
       },
     },
   },
-}
-
----@type table<string, vim.lsp.Config>
-local servers = {
   rust_analyzer = {
     cmd = { 'rustup', 'run', 'stable', 'rust-analyzer' },
     filetypes = { 'rust' },
-    ['rust-analyzer'] = {
-      cargo = { allFeatures = true },
-      rustfmt = { extraArgs = { '+nightly' } },
+    ---@type lspconfig.settings.rust_analyzer
+    settings = {
+      ['rust-analyzer'] = {
+        cargo = { features = 'all' },
+        rustfmt = { extraArgs = { '+nightly' } },
+      },
     },
   },
   uiua = {
@@ -150,33 +140,19 @@ local servers = {
 vim.pack.add {
   'https://github.com/neovim/nvim-lspconfig',
   'https://github.com/mason-org/mason.nvim',
-  'https://github.com/mason-org/mason-lspconfig.nvim',
-  'https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim',
+  -- 'https://github.com/mason-org/mason-lspconfig.nvim',
 }
 
 -- Automatically install LSPs and related tools to stdpath for Neovim
 require('mason').setup {}
 
 -- Translates between nvim-lspconfig server names and mason.nvim package names (e.g. lua_ls <-> lua-language-server)
-require('mason-lspconfig').setup {
-  automatic_enable = false, -- Change this to true if you want to automatically enable servers that are installed manually (e.g. via :Mason / :MasonInstall)
-}
 
--- Ensure the servers and tools above are installed
---
--- To check the current status of installed tools and/or manually install
--- other tools, you can run
---    :Mason
---
--- You can press `g?` for help in this menu.
-local ensure_installed = vim.tbl_keys(mason_servers or {})
-vim.list_extend(ensure_installed, {
-  -- You can add other tools here that you want Mason to install
-})
+-- require('mason-lspconfig').setup {
+--   automatic_enable = false, -- Change this to true if you want to automatically enable servers that are installed manually (e.g. via :Mason / :MasonInstall)
+-- }
 
-require('mason-tool-installer').setup { ensure_installed = ensure_installed }
-
-for name, server in pairs(vim.tbl_extend('error', servers, mason_servers)) do
+for name, server in pairs(servers) do
   vim.lsp.config(name, server)
   vim.lsp.enable(name)
 end
