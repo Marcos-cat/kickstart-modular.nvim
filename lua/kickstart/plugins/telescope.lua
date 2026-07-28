@@ -1,5 +1,3 @@
-local function gh(repo) return 'https://github.com/' .. repo end
-
 -- [[ Fuzzy Finder (files, lsp, etc) ]]
 --
 -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -26,11 +24,11 @@ local function gh(repo) return 'https://github.com/' .. repo end
 
 ---@type (string|vim.pack.Spec)[]
 local telescope_plugins = {
-  gh 'nvim-lua/plenary.nvim',
-  gh 'nvim-telescope/telescope.nvim',
-  gh 'nvim-telescope/telescope-ui-select.nvim',
+  'https://github.com/nvim-lua/plenary.nvim',
+  'https://github.com/nvim-telescope/telescope.nvim',
+  'https://github.com/nvim-telescope/telescope-ui-select.nvim',
 }
-if vim.fn.executable 'make' == 1 then table.insert(telescope_plugins, gh 'nvim-telescope/telescope-fzf-native.nvim') end
+if vim.fn.executable 'make' == 1 then table.insert(telescope_plugins, 'https://github.com/nvim-telescope/telescope-fzf-native.nvim') end
 
 -- NOTE: You can install multiple plugins at once
 vim.pack.add(telescope_plugins)
