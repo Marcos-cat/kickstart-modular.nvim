@@ -4,6 +4,7 @@ require('catppuccin').setup {
   custom_highlights = function(color)
     return {
       ColorColumn = { bg = color.surface0 },
+      FloatTitle = { fg = color.text },
 
       -- Set up highlights to match https://uiua.org/pad
       UiuaNoadicFunction = { fg = color.red },
@@ -15,7 +16,7 @@ require('catppuccin').setup {
       UiuaDyadicModifier = { fg = color.mauve },
       UiuaTriadicModifier = { fg = color.green },
       UiuaString = { fg = color.sapphire },
-      UiuaModule = { fg = color.flamingo }
+      UiuaModule = { fg = color.flamingo },
     }
   end,
 }

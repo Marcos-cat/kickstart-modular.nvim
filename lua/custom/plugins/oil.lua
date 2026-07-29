@@ -13,4 +13,4 @@ require('oil').setup {
   },
 }
 
-vim.keymap.set('n', '-', function() require('oil').open_float() end, { desc = 'Open Oil Fileviewer' })
+vim.keymap.set('n', '-', require('oil').open_float, { desc = 'Open Oil Fileviewer' })
