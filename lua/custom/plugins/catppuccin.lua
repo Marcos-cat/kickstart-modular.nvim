@@ -17,6 +17,7 @@ require('catppuccin').setup {
       UiuaTriadicModifier = { fg = color.green },
       UiuaString = { fg = color.sapphire },
       UiuaModule = { fg = color.flamingo },
+      UiuaFileIcon = { fg = color.sky }
     }
   end,
 }
