@@ -106,4 +106,10 @@ vim.o.cmdheight = 0
 -- Set an 80 character column that is visible while editing
 vim.o.colorcolumn = '80'
 
+-- Make default floating windows rounded
+vim.o.winborder = 'rounded'
+
+-- Remove end-of-buffer tildes in the sign column
+vim.opt.fillchars:append { eob = ' ' }
+
 -- vim: ts=2 sts=2 sw=2 et
