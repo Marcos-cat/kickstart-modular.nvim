@@ -80,9 +80,9 @@ vim.api.nvim_create_autocmd('LspAttach', {
 --  See `:help lsp-config` for information about keys and how to configure
 ---@type table<string, vim.lsp.Config>
 local servers = {
-  tinymist = {},
+  tinymist = { cmd = { 'tinymist' }, filetypes = { 'typst' } },
 
-  stylua = {}, -- Used to format Lua code
+  stylua = { cmd = { 'stylua', '--lsp' }, filetypes = { 'lua' } }, -- Used to format Lua code
 
   -- Special Lua Config, as recommended by neovim help docs
   lua_ls = {
@@ -112,7 +112,8 @@ local servers = {
         },
       })
     end,
-    ---@type lspconfig.settings.lua_ls
+    filetypes = { 'lua' },
+    cmd = { 'lua-language-server' },
     settings = {
       Lua = {
         format = { enable = false }, -- Disable formatting (formatting is done by stylua)
@@ -122,7 +123,6 @@ local servers = {
   rust_analyzer = {
     cmd = { 'rustup', 'run', 'stable', 'rust-analyzer' },
     filetypes = { 'rust' },
-    ---@type lspconfig.settings.rust_analyzer
     settings = {
       ['rust-analyzer'] = {
         cargo = { features = 'all' },
@@ -130,27 +130,18 @@ local servers = {
       },
     },
   },
-  uiua = {
-    cmd = { 'uiua', 'lsp' },
-    filetypes = { 'uiua' },
-    rootdir = '',
-  },
+  uiua = { cmd = { 'uiua', 'lsp' }, filetypes = { 'uiua' } },
 }
 
-vim.pack.add {
-  'https://github.com/neovim/nvim-lspconfig',
-  'https://github.com/mason-org/mason.nvim',
-  -- 'https://github.com/mason-org/mason-lspconfig.nvim',
-}
+vim.pack.add { 'https://github.com/mason-org/mason.nvim' }
 
 -- Automatically install LSPs and related tools to stdpath for Neovim
 require('mason').setup {}
 
--- Translates between nvim-lspconfig server names and mason.nvim package names (e.g. lua_ls <-> lua-language-server)
+local mason_tools = { 'lua-language-server' }
 
--- require('mason-lspconfig').setup {
---   automatic_enable = false, -- Change this to true if you want to automatically enable servers that are installed manually (e.g. via :Mason / :MasonInstall)
--- }
+local uninstalled = vim.tbl_filter(function(tool) return not require('mason-registry').is_installed(tool) end, mason_tools)
+if #uninstalled > 0 then vim.cmd('MasonInstall ' .. table.concat(uninstalled, ' ')) end
 
 for name, server in pairs(servers) do
   vim.lsp.config(name, server)
