@@ -71,81 +71,24 @@ vim.api.nvim_create_autocmd('LspAttach', {
     --
     -- This may be unwanted, since they displace some of your code
     if client and client:supports_method('textDocument/inlayHint', event.buf) then
-      map('<leader>th', function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf }) end, '[T]oggle Inlay [H]ints')
+      map('grh', function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf }) end, 'Toggle Inlay [H]ints')
     end
   end,
 })
 
--- Enable the following language servers
---  See `:help lsp-config` for information about keys and how to configure
----@type table<string, vim.lsp.Config>
-local servers = {
-  tinymist = { cmd = { 'tinymist' }, filetypes = { 'typst' } },
-
-  stylua = { cmd = { 'stylua', '--lsp' }, filetypes = { 'lua' } }, -- Used to format Lua code
-
-  -- Special Lua Config, as recommended by neovim help docs
-  lua_ls = {
-    on_init = function(client)
-      client.server_capabilities.documentFormattingProvider = false -- Disable formatting (formatting is done by stylua)
-
-      if client.workspace_folders then
-        local path = client.workspace_folders[1].name
-        if path ~= vim.fn.stdpath 'config' and (vim.uv.fs_stat(path .. '/.luarc.json') or vim.uv.fs_stat(path .. '/.luarc.jsonc')) then return end
-      end
-
-      ---@diagnostic disable-next-line: param-type-mismatch
-      client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
-        runtime = {
-          version = 'LuaJIT',
-          path = { 'lua/?.lua', 'lua/?/init.lua' },
-        },
-        workspace = {
-          checkThirdParty = false,
-          -- NOTE: this is a lot slower and will cause issues when working on your own configuration.
-          --  See https://github.com/neovim/nvim-lspconfig/issues/3189
-
-          library = vim.tbl_extend('force', vim.api.nvim_get_runtime_file('', true), {
-            '${3rd}/luv/library',
-            '${3rd}/busted/library',
-          }),
-        },
-      })
-    end,
-    filetypes = { 'lua' },
-    cmd = { 'lua-language-server' },
-    settings = {
-      Lua = {
-        format = { enable = false }, -- Disable formatting (formatting is done by stylua)
-      },
-    },
-  },
-  rust_analyzer = {
-    cmd = { 'rustup', 'run', 'stable', 'rust-analyzer' },
-    filetypes = { 'rust' },
-    settings = {
-      ['rust-analyzer'] = {
-        cargo = { features = 'all' },
-        rustfmt = { extraArgs = { '+nightly' } },
-      },
-    },
-  },
-  uiua = { cmd = { 'uiua', 'lsp' }, filetypes = { 'uiua' } },
-}
 
 vim.pack.add { 'https://github.com/mason-org/mason.nvim' }
 
 -- Automatically install LSPs and related tools to stdpath for Neovim
 require('mason').setup {}
 
-local mason_tools = { 'lua-language-server' }
+local mason_tools = { 'lua-language-server', 'tinymist' }
 
 local uninstalled = vim.tbl_filter(function(tool) return not require('mason-registry').is_installed(tool) end, mason_tools)
 if #uninstalled > 0 then vim.cmd('MasonInstall ' .. table.concat(uninstalled, ' ')) end
 
-for name, server in pairs(servers) do
-  vim.lsp.config(name, server)
-  vim.lsp.enable(name)
+for lsp in vim.fs.dir(vim.fs.joinpath(vim.fn.stdpath 'config', 'lsp')) do
+  vim.lsp.enable(string.match(lsp, '^(.+)%.lua$'))
 end
 
 -- vim: ts=2 sts=2 sw=2 et
