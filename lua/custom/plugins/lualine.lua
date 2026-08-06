@@ -1,17 +1,14 @@
-vim.pack.add {
-  'https://github.com/nvim-lualine/lualine.nvim',
-  'https://github.com/nvim-tree/nvim-web-devicons',
-}
+vim.pack.add { 'https://github.com/nvim-lualine/lualine.nvim' }
 
 vim.api.nvim_create_autocmd({ 'RecordingEnter', 'RecordingLeave' }, {
   callback = function() require('lualine').refresh { trigger = 'autocmd' } end,
   group = vim.api.nvim_create_augroup('MacroDisplay', { clear = true }),
 })
 
-local path = {
-  name = 0,
-  relative = 1,
-  absolute = 2,
+local LUALINE_PATH = {
+  NAME = 0,
+  RELATIVE = 1,
+  ABSOLUTE = 2,
 }
 
 local function macro_display()
@@ -21,7 +18,7 @@ local function macro_display()
 end
 
 local function lsps_display()
-  local lsps = {} ---@type string[]
+  local lsps = {}
   for _, lsp in ipairs(vim.lsp.get_clients()) do
     if lsp.attached_buffers[vim.api.nvim_get_current_buf()] then lsps[#lsps + 1] = lsp.name end
   end
@@ -32,34 +29,18 @@ local function lsps_display()
 end
 
 local function word_count()
-  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-  local content = table.concat(lines, ' ')
-  local _, words = content:gsub('%[[xX]%]', ' '):gsub('%a+', '')
+  local pos1, pos2 = vim.fn.getpos '.', vim.fn.getpos 'v'
+  local text
+  if vim.api.nvim_get_mode().mode == 'V' then
+    local line1, line2 = pos1[2], pos2[2]
+    line1, line2 = math.min(line1, line2), math.max(line1, line2)
+    text = table.concat(vim.api.nvim_buf_get_lines(0, line1 - 1, line2, false), '\n')
+  else
+    text = table.concat(vim.fn.getregion(pos1, pos2), '\n')
+  end
+  local _, words = text:gsub("[%a%']+", '')
   return words
 end
-
-local function word_count_cond()
-  local ft = vim.bo.filetype
-  return ft == 'markdown' or ft == 'text'
-end
-
----@param file string
-local function file_name_fmt(file)
-  local oil_dir = file:gsub('^oil://', ''):gsub('^o//', '')
-  if oil_dir == file then return file end
-
-  local cwd = vim.fn.getcwd()
-  local escaped_cwd = cwd:gsub('%W', '%%%0')
-  oil_dir = oil_dir:gsub('^' .. escaped_cwd .. '%/', '')
-
-  if oil_dir == '' then return cwd end
-  return oil_dir
-end
-
-local nvim_icon = {
-  filled = '',
-  unfilled = '',
-}
 
 require('lualine').setup {
   options = {
@@ -69,20 +50,19 @@ require('lualine').setup {
   },
   sections = {
     lualine_a = {
-      { 'mode', icon = nvim_icon.unfilled },
+      { 'mode', icon = '' },
       { macro_display },
-      { word_count, cond = word_count_cond },
+      {
+        word_count,
+        cond = function()
+          return vim.tbl_contains({ 'markdown', 'text', 'typst' }, vim.bo.filetype) and vim.tbl_contains({ 'V', 'v', 'X' }, vim.api.nvim_get_mode().mode)
+        end,
+      },
     },
     lualine_b = { { 'branch', icon = '' }, 'diff' },
     lualine_c = { 'diagnostics' },
 
-    lualine_x = {
-      {
-        'filename',
-        path = path.relative,
-        fmt = file_name_fmt,
-      },
-    },
+    lualine_x = { { 'filename', path = LUALINE_PATH.RELATIVE } },
     lualine_y = { 'filetype', { lsps_display } },
     lualine_z = { 'progress' },
   },
