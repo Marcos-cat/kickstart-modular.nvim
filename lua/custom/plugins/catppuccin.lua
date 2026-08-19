@@ -6,6 +6,8 @@ require('catppuccin').setup {
       ColorColumn = { bg = color.surface0 },
       FloatTitle = { fg = color.text },
 
+      ['@markup.italic'] = { fg = color.blue },
+
       -- Set up highlights to match https://uiua.org/pad
       UiuaNoadicFunction = { fg = color.red },
       UiuaMonadicFunction = { fg = color.green },
@@ -17,7 +19,7 @@ require('catppuccin').setup {
       UiuaTriadicModifier = { fg = color.green },
       UiuaString = { fg = color.sapphire },
       UiuaModule = { fg = color.flamingo },
-      UiuaFileIcon = { fg = color.sky }
+      UiuaFileIcon = { fg = color.sky },
     }
   end,
 }

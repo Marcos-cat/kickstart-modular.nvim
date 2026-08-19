@@ -112,4 +112,8 @@ vim.o.winborder = 'rounded'
 -- Remove end-of-buffer tildes in the sign column
 vim.opt.fillchars:append { eob = ' ' }
 
+vim.o.spell = true
+vim.o.wrap = true
+vim.o.linebreak = true
+
 -- vim: ts=2 sts=2 sw=2 et
